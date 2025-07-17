@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  unified-scraper-api:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      - REQUEST_TIMEOUT=10
+      - MAX_RETRIES=3
+      - RATE_LIMIT_DELAY=1.0
+      - MAX_CONTENT_LENGTH=1000000
+      - PORT=5000
+      - HOST=0.0.0.0
+      - DEBUG=False
+    volumes:
+      - ./logs:/app/logs
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
