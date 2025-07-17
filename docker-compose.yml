@@ -1,20 +1,21 @@
-version: '3.8'
-
 services:
-  unified-scraper-api:
-    build: .
+  scraper-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
       - "5000:5000"
+    env_file:
+      - .env  # This loads environment variables from .env file
     environment:
-      - REQUEST_TIMEOUT=10
-      - MAX_RETRIES=3
-      - RATE_LIMIT_DELAY=1.0
-      - MAX_CONTENT_LENGTH=1000000
-      - PORT=5000
+      # Override or add specific environment variables here
       - HOST=0.0.0.0
-      - DEBUG=False
+      - PORT=5000
     volumes:
       - ./logs:/app/logs
+      - ./data:/app/data
+    networks:
+      - scraper-net
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
@@ -22,3 +23,12 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+    container_name: scraper-api
+
+networks:
+  scraper-net:
+    driver: bridge
+
+volumes:
+  logs:
+  data:
