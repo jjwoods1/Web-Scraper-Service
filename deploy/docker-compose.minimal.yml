@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  scraper-api:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    ports:
+      - "5001:5000"  # Using port 5001 to avoid conflicts
+    environment:
+      - FLASK_ENV=production
+      - REQUIRE_API_KEY=true
+      - DEFAULT_API_KEY=${DEFAULT_API_KEY:-dev-key-12345}
+      - REQUEST_TIMEOUT=30
+      - ALLOWED_ORIGINS=*
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    container_name: scraper-api
